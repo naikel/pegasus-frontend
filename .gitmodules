@@ -8,3 +8,6 @@
 [submodule "thirdparty/SortFilterProxyModel"]
 	path = thirdparty/SortFilterProxyModel
 	url = https://github.com/mmatyas/SortFilterProxyModel.git
+[submodule "thirdparty/UnixSignalsInQt"]
+	path = thirdparty/UnixSignalsInQt
+	url = https://github.com/Childcity/UnixSignalsInQt.git

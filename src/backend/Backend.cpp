@@ -37,6 +37,11 @@
 #include "SortFilterProxyModel/proxyroles/proxyrolesqmltypes.h"
 #include "SortFilterProxyModel/sorters/sortersqmltypes.h"
 
+#if defined(Q_OS_LINUX)
+// For UNIX Signals catching
+#include "UnixSignalsInQt/src/csystemsignalslistener.h"
+#endif
+
 #include <QGuiApplication>
 #include <QQmlEngine>
 
@@ -268,5 +273,38 @@ void Backend::onProcessFinished()
     m_frontend->rebuild();
     m_api_private->gamepad().start(m_args);
 }
+
+#if defined(Q_OS_LINUX)
+
+void Backend::connectSystemSignals(const QCoreApplication &a)
+{	
+	using namespace childcity;
+	using SysSig = CSystemSignalsListener::SysSig;
+
+	// This will instantiate Singleton object in static memory
+    CSystemSignalsListener::GetInstance();
+
+	// Connect system signals to method, which will be emited after system signal raised
+	QObject::connect(&CSystemSignalsListener::GetInstance(), &CSystemSignalsListener::sigSystemSignal, &a, [&a, this](SysSig sig){
+		switch (sig) {
+			case SysSig::SigHup:
+				onScanRequested();
+				return;
+			case SysSig::SigTerm:
+				[[fallthrough]];
+			case SysSig::SigInt:
+				a.quit();
+				break;
+			case SysSig::SigSegv:
+				// Obviously, without next 3 lines in the code, there would not be core file.
+				const auto pid = static_cast<pid_t>(QCoreApplication::applicationPid());
+				signal(SIGSEGV, nullptr); // nullptr == SIG_DFL
+				kill(pid, SIGSEGV);
+				break;
+		}
+	}, Qt::ConnectionType::DirectConnection); // Should be always Qt::ConnectionType::DirectConnection !!!
+}
+
+#endif
 
 } // namespace backend

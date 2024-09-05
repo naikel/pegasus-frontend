@@ -74,6 +74,10 @@ int main(int argc, char *argv[])
 
     backend::Backend backend(cli_args);
     backend.start();
+    
+#if defined(Q_OS_LINUX)
+    backend.connectSystemSignals(app);
+#endif    
 
     return app.exec();
 }

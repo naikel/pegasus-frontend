@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <QCoreApplication>
+
 #include "CliArgs.h"
 
 namespace model { class ApiObject; }
@@ -38,6 +40,10 @@ public:
     Backend& operator=(const Backend&) = delete;
 
     void start();
+    
+#if defined(Q_OS_LINUX)
+    void connectSystemSignals(const QCoreApplication &a);
+#endif    
 
 private:
     const CliArgs m_args;

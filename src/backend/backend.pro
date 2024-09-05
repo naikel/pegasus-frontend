@@ -1,7 +1,7 @@
 TEMPLATE = lib
 
 QT += qml quick sql
-CONFIG += c++11 staticlib warn_on exceptions_off
+CONFIG += c++14 staticlib warn_on exceptions_off
 android: QT += androidextras
 
 !isEmpty(USE_SDL_GAMEPAD)|!isEmpty(USE_SDL_POWER): include($${TOP_SRCDIR}/thirdparty/link_to_sdl.pri)
